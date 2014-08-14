@@ -84,17 +84,23 @@
 			    for (var i = 0; i < 20; i++)
 			    {
 			        var b = bullets.create(0, 0, 'shot');
+
 			        b.name = 'shot' + i;
 			        b.exists = false;
 			        b.visible = false;
 			        b.checkWorldBounds = true;
+			        game.physics.arcade.enable(b);
+			        b.body.gravity.y = 200;
 			        b.events.onOutOfBounds.add(resetBullet, this);
+
 			    }
 			}
 			function update(){
 				console.log(bulletDirection);
 			    game.physics.arcade.collide(player, platforms);
+			    game.physics.arcade.overlap(bullets, platforms, collisionHandler, null, this);
 			    player.body.velocity.x = 0;
+
 
 			    //Controls
 			    if (keyControls.left.isDown)
@@ -144,7 +150,7 @@
 		        		else
 		            		bullet.reset(player.x - 20, player.y + 35);
 
-		            	bullet.body.velocity.x = 300 * bulletDirection;
+		            	bullet.body.velocity.x = 500 * bulletDirection;
 		            	bulletTime = game.time.now + 150;
 		        	}
 		    	}
@@ -155,9 +161,8 @@
 		    	bullet.kill();
 			}
 			//  Called if the bullet hits one of the baddie sprites
-			function collisionHandler (bullet, baddie) {
+			function collisionHandler (bullet, platform) {
 		    	bullet.kill();
-		   		baddie.kill();
 			}
 		</script>
 	</body>
