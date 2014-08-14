@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Snow Bro - Charles T. Clone</title>
+		<script type="text/javascript" src="js/phaser.min.js"></script>
+		<style type="text/css">
+			body{
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- <canvas id='gameCanvas'></canvas> -->
+		<script type='text/javascript'>
+			
+			var game = new Phaser.Game(1000, 800, Phaser.AUTO, '', { preload: preload, create: create, update: update }),
+				player, 
+				platforms, //used for manipulating platform objects
+				platform,
+				ground,
+				bullets,
+				shot,
+				shots,
+				enemy,
+				enemies, // enemy group objects
+				keyControl,
+				keyControls, // keyboard control objects
+				bulletTime = 0;
+
+			function preload(){
+				//preload images, sprites, sounds, music
+				game.load.image('ground','assets/platform.png');
+				game.load.image('baddie','assets/baddie.png');
+				game.load.image('shot','assets/star.png');
+				game.load.image('background','assets/bg.png');
+				game.load.spritesheet('snowbro','assets/sbd1.png',22,29);
+			}
+			function create(){
+				game.physics.startSystem(Phaser.Physics.ARCADE);
+				game.add.sprite(-600,-200,'background');
+				platforms = game.add.group();
+				platforms.enableBody = true;
+				
+				ground = platforms.create(0,game.world.height - 30, 'ground');
+				ground.scale.setTo(2.5,2.5);
+				ground.body.immovable = true;
+
+				// <!-- Platforms -->
+				platform = platforms.create(750, 600, 'ground');
+				platform.body.immovable = true;
+				platform.scale.setTo(0.7,1);
+				platform = platforms.create(-50, 600, 'ground');
+				platform.body.immovable = true;
+				platform.scale.setTo(0.7,1);
+				platform = platforms.create(350, 600, 'ground');
+				platform.body.immovable = true;
+				platform.scale.setTo(0.7,1);
+				platform = platforms.create(game.world.width/2 - 300, game.world.height/2,'ground');
+				platform.body.immovable = true;
+				platform.scale.setTo(1.5,1);
+
+				platform = platforms.create(-50, 200, 'ground');
+				platform.body.immovable = true;
+				platform = platforms.create(600, 200, 'ground');
+				platform.body.immovable = true;
+
+				player = game.add.sprite(game.world.width/2 - 33, game.world.height - 120,'snowbro');
+				player.scale.setTo(3,3);
+			    game.physics.arcade.enable(player);
+			    player.body.bounce.y = 0.2;
+			    player.body.gravity.y = 300;
+			    player.body.collideWorldBounds = true;
+			    player.animations.add('left', [0, 1, 2, 3], 18, true);
+			    player.animations.add('right', [15, 16, 17, 18], 25, true);
+				
+				keyControls = game.input.keyboard.createCursorKeys();
+				game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+
+				bullets = game.add.group();
+			    bullets.enableBody = true;
+			    bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+			    for (var i = 0; i < 20; i++)
+			    {
+			        var b = bullets.create(0, 0, 'shot');
+			        b.name = 'shot' + i;
+			        b.exists = false;
+			        b.visible = false;
+			        b.checkWorldBounds = true;
+			        b.events.onOutOfBounds.add(resetBullet, this);
+			    }
+			}
+			function update(){
+			    game.physics.arcade.collide(player, platforms);
+			    player.body.velocity.x = 0;
+
+			    //Controls
+			    if (keyControls.left.isDown)
+			    {
+			        player.body.velocity.x = -250;
+			        player.animations.play('left');
+			    }
+			    else if (keyControls.right.isDown)
+			    {
+			        player.body.velocity.x = 250;
+			        player.animations.play('right');
+			    }
+			    else if (keyControls.right.isUp)
+			    {
+					player.animations.stop();
+					player.frame = 18;			        
+			    }
+			    else if (keyControls.left.isUp)
+			    {
+					player.animations.stop();
+					player.frame = 0;			        
+			    }
+			    else
+			    {
+			        player.animations.stop();
+			        player.frame = 0;
+			    }
+			    if (keyControls.up.isDown && player.body.touching.down)
+			    {
+			        player.body.velocity.y = -350;
+			    }
+			    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
+			    {
+			        fireBullet();
+			    }
+			}
+			function fireBullet () {
+		    	if (game.time.now > bulletTime)
+		    	{
+		        bullet = bullets.getFirstExists(false);
+		        	if (bullet)
+		        	{
+		            	bullet.reset(player.x - 20, player.y + 35);
+		            	bullet.body.velocity.x = -300;
+		            	bulletTime = game.time.now + 150;
+		        	}
+		    	}
+			}
+			//  Called if the bullet goes out of the screen
+			function resetBullet (bullet) {
+
+		    	bullet.kill();
+			}
+			//  Called if the bullet hits one of the baddie sprites
+			function collisionHandler (bullet, baddie) {
+		    	bullet.kill();
+		   		baddie.kill();
+			}
+		</script>
+	</body>
+</html>
