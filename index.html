@@ -80,6 +80,7 @@
 				bullets = game.add.group();
 			    bullets.enableBody = true;
 			    bullets.physicsBodyType = Phaser.Physics.ARCADE;
+			    //bullets.body.gravity.y = 300;
 
 			    for (var i = 0; i < 20; i++)
 			    {
@@ -137,6 +138,7 @@
 		    	if (game.time.now > bulletTime)
 		    	{
 		        	bullet = bullets.getFirstExists(false);
+		        	bullet.body.gravity.y = 300;
 		        	if (bullet)
 		        	{
 		        		if(bulletDirection == 1)
